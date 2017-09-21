@@ -17,9 +17,6 @@ options("digits.secs"=3)
 
 source("functions.R")
 
-# set local time zone of data collection. We say it is America/New York when it is in fact local time, just to avoid having to deal with time zones
-# shift time of all physical data if not collected in Eastern Time Zone by appropriate number of hours. If collected in the Eastern Time Zone, then set change value to 0
-time.zone.change <- 1 #number of hours offset from Eastern Standard Time (i.e. "American/New_York" time zone)
 
 #PROCESS FILES ----
 message("Read and process physical data")
@@ -65,49 +62,8 @@ phy <- adply(phyFiles, 1, function(file) {
   date <- date[2]
   yy <- str_sub(date,7,8)
   
-  dateNextDay<-str_c(mm,as.character(dd+1),yy,sep = "/")
-  # shift by one day when we cross midnight
-  d$hour <- as.numeric(str_sub(d$time,1,2))
-  d$date <- date
-  d$dateTime <- str_c(d$date, d$time, sep=" ")
-  d$dateTime <- as.POSIXct(strptime(d$dateTime, format="%m/%d/%y %H:%M:%OS",
-                                    tz="America/New_York"))
-  d$dateTime <- d$dateTime - time.zone.change * 3600
-  
-  date <- scan(file, what="character", skip=1, nlines=1, quiet=TRUE)
-  date <- date[2]
-  YY <- str_sub(date,7,8)
-  YY <- str_c("2","0",YY, sep = "")
-  
-  date <- scan(file, what="character", skip=1, nlines=1, quiet=TRUE)
-  date <- date[2]
-  MM <- str_sub(date,1,2)
-  
-  date <- scan(file, what="character", skip=1, nlines=1, quiet=TRUE)
-  date <- date[2]
-  DD <- str_sub(date,4,5)
-  DD <- as.numeric(DD)
-  
-  time <- scan(file, what="character", skip=11, nlines=1, quiet=TRUE)
-  time <- time[1]
-  hh <- str_sub(time,1,2)
-  
-  time <- scan(file, what="character", skip=11, nlines=1, quiet=TRUE)
-  time <- time[1]
-  mm <- str_sub(time,4,5)
-  
-  time <- scan(file, what="character", skip=11, nlines=1, quiet=TRUE)
-  time <- time[1]
-  ss <- str_sub(time,7,8)
-  
-  d$time <- str_c(YY,MM,DD,hh,mm,ss,sep = "")
-  
-  # detect midnight shifts
-  midnightShift <- which(diff(d$dateTime) < 0)
-  if (length(midnightShift) > 0) {
-    d$dateTime[(midnightShift+1):nrow(d)] <- d$dateTime[(midnightShift+1):nrow(d)] + 24 * 3600} #added +1 to midnight shift row because original was changing the last time of the previous day to dateNextDay -KR 25-Nov-2015
-  
-  
+  d$date <- str_c(YY,MM,DD, sep = "")
+
   d$date <- NULL
   
   # code in a transect number. Use the file name as a dummy variable for transect number. Will assign proper transect number later in the pipeline.
