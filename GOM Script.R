@@ -31,39 +31,48 @@ message("Read and process physical data")
 
 # list all the physical data files in a given directory
 phyFiles <- list.files(paste0("Spatial Data Lab 5"), full=TRUE)
-phy <- adply(phyFiles, 1, function(file) {
+#phy <- adply(phyFiles, 1, function(file) {
   # read the data
-  d <- read.table(file, fileEncoding="ISO-8859-1", quote="\"", 
-                  check.names=FALSE,encoding="UTF-8", na.strings="9999.99", 
-                  sep = "\t", skip = 10, header = TRUE, stringsAsFactors =FALSE)
+  g <- GOM
+  a <- Alaska
+  p <- Peru
   
   # clean names
-  head <- names(d)
+  head <- names(g)
   head <- str_replace(head, "\\(.*\\)", "")
   head <- str_trim(head)
   head <- make.names(head)
   head <- tolower(head)
   head <- str_replace(head, fixed(".."), ".")
   
+  heada <- names(a)
+  heada <- str_replace(head, "\\(.*\\)", "")
+  heada <- str_trim(head)
+  heada <- make.names(head)
+  heada <- tolower(head)
+  heada <- str_replace(head, fixed(".."), ".")
+  
+  headp <- names(p)
+  headp <- str_replace(head, "\\(.*\\)", "")
+  headp <- str_trim(head)
+  headp <- make.names(head)
+  headp <- tolower(head)
+  headp <- str_replace(head, fixed(".."), ".")
+  
   # assign names
-  names(d) <- head
+  names(g) <- head
+  
+  names(a) <- heada
+  
+  names(p) <- headp
   
   # create a proper date + time format
-  date <- scan(file[1], what="character", skip=1, nlines=1, quiet=TRUE)
-  date <- date[2]
-  mm <- str_sub(date,1,2)
+  g$date <- paste(g$year,g$month,g$day, sep = "") 
   
-  date <- scan(file[1], what="character", skip=1, nlines=1, quiet=TRUE)
-  date <- date[2]
-  dd <- str_sub(date,4,5)
-  dd <- as.numeric(dd)
+  a$date <- paste(a$year,a$month, sep = "")
   
-  date <- scan(file[1], what="character", skip=1, nlines=1, quiet=TRUE)
-  date <- date[2]
-  yy <- str_sub(date,7,8)
-  
-  d$date <- str_c(YY,MM,DD, sep = "")
-
+  p$date <- paste(p$year,p$month,p$day, sep = "")
+ 
   d$date <- NULL
   
   # code in a transect number. Use the file name as a dummy variable for transect number. Will assign proper transect number later in the pipeline.
@@ -90,7 +99,7 @@ phy <- adply(phyFiles, 1, function(file) {
   
   d$sw.density<-swRho(salinity = d$salinity, temperature = d$temp, pressure = d$pressure, eos = "unesco")
   return(d)
-}, .inform = T, .progress="text")
+#}, .inform = T, .progress="text")
 
 ##{ EXERCISE 3: Clean up data & add transect names -------------------------
 
