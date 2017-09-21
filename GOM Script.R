@@ -67,12 +67,21 @@ phyFiles <- list.files(paste0("Spatial Data Lab 5"), full=TRUE)
   names(p) <- headp
   
   # create a proper date + time format
-  g$date <- paste(g$year,g$month,g$day, sep = "") 
+  M <- g$month
+  M <- sprintf("%02d",M)
+  D <- g$day
+  D <- sprintf("%02d",D)
+  g$date <- paste(g$year,M,D, sep = "")
   
   a$date <- paste(a$year,a$month, sep = "")
   
-  p$date <- paste(p$year,p$month,p$day, sep = "")
- 
+  date <- scan(a, what="character", skip=1, nlines=1, quiet=TRUE)
+  date <- date[2]
+  DD <- str_sub(date,4,5)
+  DD <- as.numeric(DD)
+  
+  p$date <- paste(p$year,p$month,DD, sep = "")
+  
   d$date <- NULL
   
   # code in a transect number. Use the file name as a dummy variable for transect number. Will assign proper transect number later in the pipeline.
