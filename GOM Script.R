@@ -73,7 +73,9 @@ phyFiles <- list.files(paste0("Spatial Data Lab 5"), full=TRUE)
   D <- sprintf("%02d",D)
   g$date <- paste(g$year,M,D, sep = "")
   
-  a$date <- paste(a$year,a$month, sep = "")
+  m <- a$month
+  m <- sprintf("%02d",m)
+  a$date <- paste(a$year,m, sep = "")
   
   date <- scan(a, what="character", skip=1, nlines=1, quiet=TRUE)
   date <- date[2]
