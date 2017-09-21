@@ -77,26 +77,17 @@ phyFiles <- list.files(paste0("Spatial Data Lab 5"), full=TRUE)
   m <- sprintf("%02d",m)
   a$date <- paste(a$year,m, sep = "")
   
-  date <- scan(a, what="character", skip=1, nlines=1, quiet=TRUE)
-  date <- date[2]
-  DD <- str_sub(date,4,5)
-  DD <- as.numeric(DD)
+  g$date <- NULL
   
-  p$date <- paste(p$year,p$month,DD, sep = "")
+  a$date <- NULL
   
-  d$date <- NULL
-  
-  # code in a transect number. Use the file name as a dummy variable for transect number. Will assign proper transect number later in the pipeline.
-  d$transect <- basename(file)
-  
-  #create time field in format for input into GIS
-  
-  
+  p$date <- NULL
+
   # reformat the lat and long in decimal degrees.
-  names(d)[names(d)=="lat"]<-"lat"
-  d$lat <- to.dec.2015(d$lat)
-  names(d)[names(d)=="long"]<-"lon"
-  d$lon <- to.dec.2015(d$lon)
+  names(p)[names(p)=="LAT"]<-"lat"
+  p$lat <- to.dec.2015(p$lat)
+  names(p)[names(p)=="LONG"]<-"long"
+  p$long <- to.dec.2015(p$long)
   
   # columns that are all zero are not possible. They are actually missing data. Detect them
   totCol <- colSums(d[llply(d, class) == "numeric"])
