@@ -57,14 +57,7 @@ phyFiles <- list.files(paste0("Spatial Data Lab 5"), full=TRUE)
   headp <- make.names(head)
   headp <- tolower(head)
   headp <- str_replace(head, fixed(".."), ".")
-  
-  # assign names
-  names(g) <- head
-  
-  names(a) <- head
-  
-  names(p) <- head
-  
+
   # create a proper date + time format
   M <- g$month
   M <- sprintf("%02d",M)
@@ -75,15 +68,13 @@ phyFiles <- list.files(paste0("Spatial Data Lab 5"), full=TRUE)
   m <- a$month
   m <- sprintf("%02d",m)
   a$date <- paste(a$year,m, sep = "")
-  
-  g$date <- NULL
-  
-  a$date <- NULL
-  
-  p$date <- NULL
 
   # reformat the lat and long in decimal degrees.
-
+  p$LONG <- gsub("W","", p$LONG)
+  p$LAT <- gsub("S","", p$LAT)
+  p$LONG <- gsub("°","", p$LONG)
+  p$LAT <- gsub("°","", p$LAT)
+  
   # columns that are all zero are not possible. They are actually missing data. Detect them
   totCol <- colSums(d[llply(d, class) == "numeric"])
   allZeroCols <- names(totCol)[which(totCol == 0)]
