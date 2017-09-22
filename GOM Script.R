@@ -1,4 +1,4 @@
-Functions to process raw data
+#Functions to process raw data
 #
 #  (c) Copyright 2013-2014 Jean-Olivier Irisson
 #       and Jessica Luo
@@ -29,8 +29,8 @@ message("Read and process physical data")
 # 4) corrects the time zone and adds in transect number, and converts lat/long into decimal degrees
 
 # list all the physical data files in a given directory
-phyFiles <- list.files(paste0("Spatial Data Lab 5"), full=TRUE)
-#phy <- adply(phyFiles, 1, function(file) {
+
+
   # read the data
   g <- GOM
   a <- Alaska
@@ -72,16 +72,25 @@ phyFiles <- list.files(paste0("Spatial Data Lab 5"), full=TRUE)
   # reformat the lat and long in decimal degrees.
   p$LONG <- gsub("W","", p$LONG)
   p$LAT <- gsub("S","", p$LAT)
-  p$LONG <- gsub("°","", p$LONG)
-  p$LAT <- gsub("°","", p$LAT)
+  p$LONG <- gsub("°"," ", p$LONG)
+  p$LAT <- gsub("°"," ", p$LAT)
   
-  # columns that are all zero are not possible. They are actually missing data. Detect them
+  p$LONG <- measurements::conv_unit(p$LONG, from = 'deg_dec_min', to = 'dec_deg')
+  p$LAT <- measurements::conv_unit(p$LAT, from = 'deg_dec_min', to = 'dec_deg')
+  
+  p$LONG <- as.numeric(p$LONG)
+  p$LAT <- as.numeric(p$LAT)
+ 
+  p$LONG <- p$LONG* -1
+  
+   # columns that are all zero are not possible. They are actually missing data. Detect them
   totCol <- colSums(d[llply(d, class) == "numeric"])
   allZeroCols <- names(totCol)[which(totCol == 0)]
   d[,allZeroCols] <- NA # replace the content with NAs
   
-#}, .inform = T, .progress="text")
 
 
 #write and export data
-write.table(phy_t,file = "Peru.txt", row.names = FALSE, col.names = TRUE)
+  write.table(p, "Peru.txt", sep = "\t", row.names = FALSE, col.names = TRUE)
+  write.table(a, "Alaska.txt", sep = "\t", row.names = FALSE, col.names = TRUE)
+  write.table(g, "GOM.txt", sep = "\t", row.names = FALSE, col.names = TRUE)
