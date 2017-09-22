@@ -10,12 +10,11 @@ library("plyr")
 library("stringr")
 library("pastecs")
 library("oce")
+library("measurements")
 
 options("digits.secs"=3)
 
 # SET OPTIONS & IDENTIFIERS ----
-
-source("functions.R")
 
 
 #PROCESS FILES ----
@@ -62,9 +61,9 @@ phyFiles <- list.files(paste0("Spatial Data Lab 5"), full=TRUE)
   # assign names
   names(g) <- head
   
-  names(a) <- heada
+  names(a) <- head
   
-  names(p) <- headp
+  names(p) <- head
   
   # create a proper date + time format
   M <- g$month
@@ -84,62 +83,14 @@ phyFiles <- list.files(paste0("Spatial Data Lab 5"), full=TRUE)
   p$date <- NULL
 
   # reformat the lat and long in decimal degrees.
-  names(p)[names(p)=="LAT"]<-"lat"
-  p$lat <- to.dec.2015(p$lat)
-  names(p)[names(p)=="LONG"]<-"long"
-  p$long <- to.dec.2015(p$long)
-  
+
   # columns that are all zero are not possible. They are actually missing data. Detect them
   totCol <- colSums(d[llply(d, class) == "numeric"])
   allZeroCols <- names(totCol)[which(totCol == 0)]
   d[,allZeroCols] <- NA # replace the content with NAs
   
-  names(d)[names(d)=="irrandiance"]<-"irradiance"
-  
-  # keep only interesting data
-  d <- d[,c("transect", "dateTime", "time", "depth", "lat", "lon", "temp", "salinity", "pressure", "fluoro", "oxygen", "irradiance")]
-  
-  d$sw.density<-swRho(salinity = d$salinity, temperature = d$temp, pressure = d$pressure, eos = "unesco")
-  return(d)
 #}, .inform = T, .progress="text")
 
-##{ EXERCISE 3: Clean up data & add transect names -------------------------
-
-# the depth gets stuck from time to time and that results in jumps afterwards. Remove those stuck points and reinterpolate the depth linarly using time.
-# assign the depths in which the difference before the previous depth is 0 to be NA
-phy$depth[which(diff(phy$depth)==0)+1] <- NA
-phy<-phy[,-1]
-# interpolation depth using dateTime
-phy$depth <- approx(phy$dateTime, phy$depth, phy$dateTime, method="linear")$y
-
-# remove some erroneous values
-phy$oxygen <- ifelse(phy$oxygen < 0, NA, phy$oxygen)
-phy$temp <- ifelse(phy$temp < 0, NA, phy$temp)
-phy$salinity <- ifelse(phy$salinity < 0, NA, phy$salinity)
-phy$irradiance <- ifelse(phy$irradiance < 0, NA, phy$irradiance)
-
-
-# Add transect names here --
-transect.names <- read.csv("transect file names.csv", header = TRUE, stringsAsFactors = FALSE)
-transect.names <- as.data.frame(transect.names)
-phy_t <- merge(x=phy, y=transect.names, by.x = "transect", by.y = "physicaldatafilename", all.x=T)
-
-phy_t$depth <- -1*(phy_t$depth)
-
-#interpolate missing lat and lon data using time
-phy_t$lat <- approx(x=as.numeric(phy_t$dateTime), y=phy_t$lat, xo=as.numeric(phy_t$dateTime))$y
-phy_t$lon <- approx(x=as.numeric(phy_t$dateTime), y=phy_t$lon, xo=as.numeric(phy_t$dateTime))$y
-
-#save phy frame (non-averaged data) as R object
-save(phy_t, file = paste0("processed_phys_data.Rdata"))
-
-#replace NAs with non-sensical number
-phy_t[is.na(phy_t)] <- -999.99
-
-#Subset and re-order columns
-phy_t <- phy_t[c("cruise", "transect.id", "region", "area", "haul", "tow", "dateTime", "time", 
-                 "lat", "lon", "depth", "temp", "salinity", "pressure", "fluoro", "oxygen", 
-                 "irradiance", "sw.density")]
 
 #write and export data
 write.table(phy_t,file = "Peru.txt", row.names = FALSE, col.names = TRUE)
