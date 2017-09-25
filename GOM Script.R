@@ -85,9 +85,17 @@ message("Read and process physical data")
   p$LAT <- p$LAT* -1
   
    # columns that are all zero are not possible. They are actually missing data. Detect them
-  totCol <- colSums(d[llply(d, class) == "numeric"])
+  totCol <- colSums(g[llply(g, class) == "numeric"])
   allZeroCols <- names(totCol)[which(totCol == 0)]
-  d[,allZeroCols] <- NA # replace the content with NAs
+  g[,allZeroCols] <- NA # replace the content with NAs
+  
+  totCol <- colSums(a[llply(a, class) == "numeric"])
+  allZeroCols <- names(totCol)[which(totCol == 0)]
+  a[,allZeroCols] <- NA # replace the content with NAs
+  
+  totCol <- colSums(p[llply(p, class) == "numeric"])
+  allZeroCols <- names(totCol)[which(totCol == 0)]
+  p[,allZeroCols] <- NA # replace the content with NAs
   
 
 
