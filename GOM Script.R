@@ -59,11 +59,11 @@ message("Read and process physical data")
   headp <- str_replace(head, fixed(".."), ".")
 
   # create a proper date + time format
-  M <- g$month
+  M <- g$Month
   M <- sprintf("%02d",M)
-  D <- g$day
+  D <- g$Day
   D <- sprintf("%02d",D)
-  g$date <- paste(g$year,M,D, sep = "")
+  g$date <- paste(g$Year,M,D, sep = "")
   
   m <- a$month
   m <- sprintf("%02d",m)
@@ -82,6 +82,7 @@ message("Read and process physical data")
   p$LAT <- as.numeric(p$LAT)
  
   p$LONG <- p$LONG* -1
+  p$LAT <- p$LAT* -1
   
    # columns that are all zero are not possible. They are actually missing data. Detect them
   totCol <- colSums(d[llply(d, class) == "numeric"])
